@@ -1,6 +1,9 @@
-pandas
-numpy
+
+numpy==1.26.4
+pandas==2.2.3
 scikit-learn
 joblib
 pyyaml
-dvc
+fastapi
+uvicorn
+mlflow

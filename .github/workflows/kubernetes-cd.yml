@@ -1,0 +1,38 @@
+
+name: Kubernetes CD
+
+on:
+  workflow_run:
+    workflows: ["Docker CI/CD"]
+    types:
+      - completed
+
+permissions:
+  contents: read
+  packages: read
+
+jobs:
+  deploy:
+    if: github.event.workflow_run.conclusion == 'success'
+    runs-on: [self-hosted, Windows, X64]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Verify Kubernetes connection
+        shell: powershell
+        run: kubectl get nodes
+
+      - name: Deploy Iris API
+        shell: powershell
+        run: |
+          kubectl set image deployment/iris-api iris-api=ghcr.io/rithiga45/mlops-iris-project:latest
+          kubectl rollout status deployment/iris-api --timeout=180s
+
+      - name: Verify deployment
+        shell: powershell
+        run: |
+          kubectl get deployments
+          kubectl get pods
+          kubectl get services
